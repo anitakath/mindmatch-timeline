@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMatch Agile Epic Timeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            /* User's Phase Colors (used here as Epic background colors for context) */
+            --color-epic-1: #3b82f6; /* Planning/Discovery (P1) */
+            --color-epic-2: #22c55e; /* Research/Req (P1/P2) */
+            --color-epic-3: #f97316; /* Architecture/Design (P1/P2) */
+            --color-epic-4: #6d28d9; /* Frontend (P2/P3/P4) */
+            --color-epic-5: #059669; /* Backend (P2/P3) */
+            --color-epic-6: #1d4ed8; /* Security (P3) */
+            --color-epic-7: #a855f7; /* Testing/QA (P4) */
+            --color-epic-8: #ef4444; /* Deployment/GoLive (P5) */
+            --color-primary: #6d28d9; /* Main Purple */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fa;
+            color: #1f2937;
+        }
+        .container-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Custom Styles for the Timeline */
+        .timeline-container {
+            overflow-x: auto;
+            padding-bottom: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .timeline-grid {
+            /* Ensures enough width for all 13 sprints + padding/labels */
+            min-width: 1800px;
+            display: grid;
+            grid-template-columns: 280px repeat(13, 1fr); /* Wider column for Epic labels */
+            padding: 0 30px;
+        }
+        .grid-header, .grid-cell {
+            padding: 12px 10px;
+            border-right: 1px solid #e5e7eb;
+            font-size: 14px;
+            text-align: center;
+        }
+        .grid-header {
+            font-weight: 700;
+            background-color: #eef2ff; /* Light purple background */
+            color: var(--color-primary);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .grid-row-label {
+            text-align: left;
+            font-weight: 600;
+            background-color: #f9fafb;
+            border-right: 2px solid #e5e7eb;
+            padding-left: 20px;
+            color: #374151;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+        .epic-bar-container {
+            position: relative;
+            height: 100%;
+        }
+        .epic-bar {
+            height: 70%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 0 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            overflow: hidden;
+            cursor: pointer;
+            text-shadow: 0 0 3px rgba(0,0,0,0.3);
+        }
+        .epic-bar:hover {
+            transform: translateY(-50%) scale(1.01);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* Epic Colors */
+        .epic-1 { background-color: var(--color-epic-1); }
+        .epic-2 { background-color: var(--color-epic-2); }
+        .epic-3 { background-color: var(--color-epic-3); }
+        .epic-4 { background-color: var(--color-epic-4); }
+        .epic-5 { background-color: var(--color-epic-5); }
+        .epic-6 { background-color: var(--color-epic-6); }
+        .epic-7 { background-color: var(--color-epic-7); }
+        .epic-8 { background-color: var(--color-epic-8); }
+        
+        /* Milestone Line */
+        .milestone-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: #f97316; /* Using Orange for Milestones */
+            z-index: 20;
+            pointer-events: none;
+        }
+        .milestone-marker {
+            position: absolute;
+            top: -20px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #f97316;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 900;
+            box-shadow: 0 0 0 5px #f4f7fa;
+            z-index: 21;
+        }
+        .milestone-label {
+            position: absolute;
+            top: -55px;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-weight: 700;
+            color: #f97316;
+            background-color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #f97316;
+            font-size: 12px;
+            z-index: 22;
+            cursor: pointer;
+        }
+        .timeline-row {
+             display: contents;
+        }
+        .timeline-row:nth-child(even) .grid-row-label {
+            background-color: #ffffff;
+        }
+        .timeline-row:nth-child(odd) .grid-row-label {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-wrapper">
+    <div class="py-6">
+        <h1 class="text-4xl font-bold text-center mb-2" style="color: var(--color-primary);">MindMatch Agile Epic Timeline</h1>
+        <p class="text-center text-gray-500 mb-8">Visualisierung des parallelen Sprint-Verlaufs (05. Jan. 2026 – 04. Jul. 2026)</p>
+    </div>
+
+    <div class="timeline-container">
+        
+        <!-- Timeline Headers (Months and Sprints) -->
+        <div class="timeline-grid font-mono text-xs border-b border-gray-300">
+            <!-- Labels Column -->
+            <div class="grid-header grid-row-label sticky left-0 z-20 rounded-tl-lg" style="border-right: none;">
+                Epic / Fokus
+            </div>
+            
+            <!-- Sprint Columns (Monthly Grouping) -->
+            <div class="grid-header bg-blue-100/70" style="grid-column: 2 / span 3;">Jan-Feb</div>
+            <div class="grid-header bg-green-100/70" style="grid-column: 5 / span 4;">Feb-Apr</div>
+            <div class="grid-header bg-yellow-100/70" style="grid-column: 9 / span 3;">Apr-Jun</div>
+            <div class="grid-header bg-red-100/70 rounded-tr-lg" style="grid-column: 12 / span 3;">Jun-Jul</div>
+
+            
+            <!-- Sprint Details (Numbers) -->
+            <div class="grid-row-label">SPRINT NR.</div>
+            <script>
+                // JavaScript to dynamically generate sprint numbers and dates
+                const startDate = new Date('2026-01-05');
+                const sprints = 13;
+                const sprintDurationDays = 14;
+                const options = { month: 'short', day: 'numeric' };
+                const headerGrid = document.querySelector('.timeline-grid');
+
+                for (let i = 1; i <= sprints; i++) {
+                    const sprintLabel = document.createElement('div');
+                    sprintLabel.className = 'grid-cell font-bold text-sm bg-gray-50';
+                    sprintLabel.textContent = i;
+                    headerGrid.appendChild(sprintLabel);
+                }
+            </script>
+        </div>
+        
+        <!-- Sprint Dates Row -->
+        <div class="timeline-grid border-b border-gray-300">
+             <div class="grid-row-label font-normal text-xs text-gray-600">Dauer (2 Wochen)</div>
+             <script>
+                const dateGrid = document.querySelector('.timeline-grid:nth-child(2)');
+                for (let i = 1; i <= sprints; i++) {
+                    const start = new Date(startDate.getTime() + (i - 1) * sprintDurationDays * 24 * 60 * 60 * 1000);
+                    const end = new Date(startDate.getTime() + i * sprintDurationDays * 24 * 60 * 60 * 1000 - 24 * 60 * 60 * 1000);
+
+                    const sprintDateLabel = document.createElement('div');
+                    sprintDateLabel.className = 'grid-cell font-normal text-xs bg-gray-50';
+                    sprintDateLabel.textContent = `${start.toLocaleDateString('de-DE', options)} → ${end.toLocaleDateString('de-DE', options)}`;
+                    dateGrid.appendChild(sprintDateLabel);
+                }
+             </script>
+        </div>
+
+
+        <!-- EPIC ROWS -->
+
+        <!-- EPIC 1: Project Planning & Management -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 1: Projektplanung & Mgt.</div>
+            <div class="grid-cell epic-bar-container" style="grid-column: 2 / span 1; border-right: none;">
+                <div class="epic-bar epic-1" style="left: 0; width: 100%;" title="E1: Define vision, goals, setup tools.">
+                    Kickoff
+                </div>
+            </div>
+             <!-- Remaining columns are empty, but needed for grid structure -->
+             <div style="grid-column: 3 / span 12;"></div>
+        </div>
+
+        <!-- EPIC 2: User Research & Requirements -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 2: Research & Requirements</div>
+            <div style="grid-column: 2;"></div> <!-- Skip Sprint 1 -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 3 / span 2; border-right: none;">
+                <div class="epic-bar epic-2" style="left: 0; width: 100%;" title="E2: Collect functional/non-functional requirements, MoSCoW prioritization.">
+                    Research & Priorisierung
+                </div>
+            </div>
+            <div style="grid-column: 5 / span 9;"></div>
+        </div>
+        
+        <!-- EPIC 3: System Design & Architecture -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 3: System Design & Arch.</div>
+            <div style="grid-column: 2;"></div> <!-- Skip Sprint 1 -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 3 / span 3; border-right: none;">
+                <div class="epic-bar epic-3" style="left: 0; width: 100%;" title="E3: Database Schema, API Endpoints, High-fidelity UI Mockups.">
+                    Architektur & Design
+                </div>
+            </div>
+            <div style="grid-column: 6 / span 8;"></div>
+        </div>
+        
+        <!-- EPIC 5: Backend Development (Listed before FE because it holds the core logic) -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 5: Backend Development</div>
+            <div style="grid-column: 2 / span 2;"></div> <!-- Skip Sprints 1, 2 -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 4 / span 6; border-right: none;">
+                <div class="epic-bar epic-5" style="left: 0; width: 100%;" title="E5: Auth foundation, Database CRUD, Matching & Preference APIs, Matching Algorithm v1/v2.">
+                    Core APIs & Matching Logic
+                </div>
+            </div>
+            <div style="grid-column: 10 / span 4;"></div>
+        </div>
+
+        <!-- EPIC 4: Frontend Development -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 4: Frontend Development</div>
+            <div style="grid-column: 2 / span 2;"></div> <!-- Skip Sprints 1, 2 -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 4 / span 10; border-right: none;">
+                <div class="epic-bar epic-4" style="left: 0; width: 100%;" title="E4: Authentication UI, Dashboards, Responsive Design, Accessibility, UX Polish. Runs until Go-Live.">
+                    UI/UX, Dashboards & Accessibility
+                </div>
+            </div>
+        </div>
+
+        <!-- EPIC 6: Data Protection & Security -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 6: Data Protection & Security</div>
+            <div style="grid-column: 2 / span 6;"></div> <!-- Skip Sprints 1-6 (Focus on core first) -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 8 / span 3; border-right: none;">
+                <div class="epic-bar epic-6" style="left: 0; width: 100%;" title="E6: GDPR, RBAC, Data Encryption, Secure API Configuration, Penetration Testing.">
+                    Security Hardening & GDPR
+                </div>
+            </div>
+            <div style="grid-column: 11 / span 3;"></div>
+        </div>
+
+        <!-- EPIC 7: Testing & Quality Assurance -->
+        <div class="timeline-grid border-b border-gray-200 h-16">
+            <div class="grid-row-label">Epic 7: Testing & Quality Assurance</div>
+            <div style="grid-column: 2 / span 9;"></div> <!-- Skip Sprints 1-9 (Developer/Unit Testing happens internally) -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 11 / span 3; border-right: none;">
+                <div class="epic-bar epic-7" style="left: 0; width: 100%;" title="E7: Usability Testing, E2E Tests, Performance Optimization, Bug Fixing & Stabilization.">
+                    QA, Performance & Bug Fixing
+                </div>
+            </div>
+        </div>
+        
+        <!-- EPIC 8: Deployment & Documentation -->
+        <div class="timeline-grid h-16">
+            <div class="grid-row-label">Epic 8: Deployment & Docs.</div>
+            <div style="grid-column: 2 / span 10;"></div> <!-- Skip Sprints 1-10 -->
+            <div class="grid-cell epic-bar-container" style="grid-column: 12 / span 2; border-right: none;">
+                <div class="epic-bar epic-8" style="left: 0; width: 100%;" title="E8: Production Environment Prep, CI/CD, Documentation, Handover.">
+                    Deployment & Go-Live Prep
+                </div>
+            </div>
+            <div style="grid-column: 14;"></div>
+        </div>
+        
+        
+        <!-- Milestones Row (Visual Separator) -->
+        <div class="timeline-grid pt-12 pb-8 relative">
+            <div class="grid-row-label text-lg font-bold text-gray-700 pt-16" style="border-right: none;">
+                Meilensteine
+            </div>
+            
+            <!-- Placeholder cells for correct alignment -->
+            <div style="grid-column: 2 / span 13;"></div>
+
+            <!-- Milestone 1: FOUNDATION COMPLETE (End of Sprint 2) -->
+            <div class="milestone-line" style="left: calc((2 / 13) * 100%);">
+                <div class="milestone-marker">1</div>
+                <div class="milestone-label" style="left: -100px;">🎉 M1: FOUNDATION COMPLETE (02. Feb.)</div>
+            </div>
+
+            <!-- Milestone 2: FIRST CLICKABLE PRODUCT (End of Sprint 6) -->
+            <div class="milestone-line" style="left: calc((6 / 13) * 100%);">
+                <div class="milestone-marker">2</div>
+                <div class="milestone-label" style="left: -100px;">🎉 M2: CLICKABLE PRODUCT (30. März)</div>
+            </div>
+
+            <!-- Milestone 3: ALPHA READY (End of Sprint 10) -->
+            <div class="milestone-line" style="left: calc((10 / 13) * 100%);">
+                <div class="milestone-marker">3</div>
+                <div class="milestone-label" style="left: -100px;">🎉 M3: ALPHA READY (25. Mai)</div>
+            </div>
+
+            <!-- Milestone 4: BETA READY (End of Sprint 12) -->
+            <div class="milestone-line" style="left: calc((12 / 13) * 100%);">
+                <div class="milestone-marker">4</div>
+                <div class="milestone-label" style="left: -100px;">🎉 M4: BETA READY (22. Jun.)</div>
+            </div>
+
+            <!-- Milestone 5: GO-LIVE (End of Sprint 13) -->
+            <div class="milestone-line" style="right: 0px; transform: translateX(50%);">
+                <div class="milestone-marker">5</div>
+                <div class="milestone-label" style="left: -10px;">🎉 M5: GO-LIVE! (04. Jul.) 🚀</div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <!-- Legend -->
+    <div class="mt-8 text-sm font-semibold text-gray-700 max-w-4xl mx-auto">
+        <h3 class="text-lg font-bold mb-3 text-center" style="color: #374151;">Legende der Epics und Fokus-Phasen</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-1);"></span>E1: Planung & Mgt.</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-2);"></span>E2: Research & Req.</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-3);"></span>E3: System Design & Arch.</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-5);"></span>E5: Backend Development</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-4);"></span>E4: Frontend Development</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-6);"></span>E6: Security Hardening</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-7);"></span>E7: Testing & QA</div>
+            <div class="flex items-center"><span class="w-4 h-4 rounded mr-2" style="background-color: var(--color-epic-8);"></span>E8: Deployment & Docs.</div>
+        </div>
+    </div>
+    
+</div>
+
+</body>
+</html>

@@ -21,7 +21,7 @@ const MILESTONES = [
     { sprintEnd: 6, label: '🎉 M2: CORE LOGIC DONE (13. März)', offset: 100 },
     { sprintEnd: 9, label: '🎉 M3: FEATURES COMPLETE (24. April)', offset: 100 },
     { sprintEnd: 12, label: '🎉 M4: BETA READY (05. Jun.)', offset: 100 },
-    { sprintEnd: 13, label: '🎉 M5: GO-LIVE! (19. Jun.) 🚀', offset: 10 },
+    { sprintEnd: 13, label: '🎉 M5: GO-LIVE! (05. Jul.) 🚀', offset: 10 },
 ];
 
 const TOTAL_SPRINTS = 13;
@@ -74,7 +74,7 @@ const EpicBar: React.FC<EpicBarProps> = ({ epicKey }) => {
                 }}
                 title={`${epic.label}: ${epic.description}`}
             >
-                {epic.label.split(': ')[1]}
+                {epic.label.split(': ')[1]} 
             </div>
         </div>
     );
@@ -127,6 +127,17 @@ export default function Home() {
         'epic-1', 'epic-2', 'epic-3', 'epic-5', 'epic-4', 'epic-6', 'epic-7', 'epic-8'
     ];
 
+
+    // Navigations-Logik: Simuliert die Weiterleitung zu einer dynamischen Route.
+    const handleSprintClick = (sprintNumber: number) => {
+      const targetUrl = `/sprint/${sprintNumber}`;
+      
+      // In einer realen Next.js-Anwendung würden Sie 'useRouter().push(targetUrl)' verwenden.
+      // Hier verwenden wir window.location.href zur Demonstration der Navigationsabsicht.
+      console.log(`Navigating to: ${targetUrl}`);
+      window.location.href = targetUrl;
+  };
+
     return (
         <>
             <Head>
@@ -150,8 +161,12 @@ export default function Home() {
                         <p className="text-center text-gray-500 dark:text-gray-400 mb-8">
                           Visualization of the parallel sprint process (Jan. 5, 2026 – June 19, 2026)
                         </p>
+                        
                     </div>
-
+                    <p className="text-center text-violet-300 mb-8">
+                      <em>
+                        Future feature: Click on the respective sprint number to view the exact processes during that sprint. </em>
+                    </p>
                     <div className=" overflow-x-auto w-full max-w-[1400px] pb-4 bg-white dark:bg-zinc-800 rounded-xl shadow-2xl">
                         
                         {/* --- Custom CSS Grid Styles (Inline/Utility Classes) --- */}
@@ -244,7 +259,13 @@ export default function Home() {
                             <div className="grid-row-label">SPRINT NR.</div>
                             {sprintDates.map(s => (
                                 <div key={s.number} className="grid-cell font-bold text-sm bg-gray-50 dark:bg-zinc-700 dark:text-white">
-                                    {s.number}
+                                    <button 
+                                        className='cursor-pointer text-gray-700 dark:text-white hover:text-purple-300 transition duration-200 p-1 rounded'
+                                        title={`Details zu Sprint ${s.number}`}
+                                        onClick={() => handleSprintClick(s.number)}
+                                    > 
+                                        {s.number} 
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -278,12 +299,11 @@ export default function Home() {
                         ))}
                         
                         {/* Milestones Row (KORRIGIERT) */}
-                        <div className="timeline-grid pt-12 pb-8 relative">
+                        <div className="timeline-grid pt-12 pb-8relative">
                             {/* Milestone Label */}
-                            <div className="grid-row-label text-lg font-bold text-gray-700 dark:text-gray-200 pt-16" style={{ borderRight: 'none', background: 'transparent' }}>
+                            <div className="grid-row-label text-lg font-bold pt-16" style={{ borderRight: 'none', background: 'transparent' }}>
                                 Milestones
                             </div>
-                            
                             {/* Milestone lines are absolutely positioned within this container */}
                             <div style={{ 
                                 gridColumn: '2 / span 13', 
